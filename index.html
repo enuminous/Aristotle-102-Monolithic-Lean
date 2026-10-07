@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aristotle × EFMW-102 — Machine-Checked Consequences</title>
+<meta name="description" content="Lean 4 analysis of the Monolithic EFMW-102 corpus: about 40 machine-checked mathematical consequences, negative results, and open proof obligations.">
+<style>
+:root{
+  --bg:#071018;--panel:#0d1824;--panel2:#122234;--ink:#eef5fb;--muted:#a5b4c7;
+  --line:#294258;--cyan:#97ddff;--gold:#ffd38b;--green:#9fe5b6;--red:#ffaaa2;--violet:#c8b9ff;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:
+radial-gradient(circle at 18% -10%,rgba(59,139,192,.18),transparent 30%),
+radial-gradient(circle at 88% 0,rgba(126,83,181,.12),transparent 28%),
+var(--bg);color:var(--ink);font:17px/1.72 Georgia,"Times New Roman",serif}
+a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
+.wrap{max-width:1180px;margin:auto;padding:26px 22px 80px}
+nav{display:flex;gap:15px;flex-wrap:wrap;align-items:center;font:600 .9rem/1.2 system-ui,sans-serif;margin-bottom:38px}
+.brand{margin-right:auto;font-weight:850;letter-spacing:.08em}
+.hero{padding:42px 0 38px;border-bottom:1px solid var(--line)}
+.eyebrow{font:800 .76rem/1.2 system-ui,sans-serif;text-transform:uppercase;letter-spacing:.16em;color:var(--gold)}
+h1{font-size:clamp(3rem,7vw,6.5rem);line-height:.94;letter-spacing:-.055em;margin:.16em 0 .2em;max-width:1040px}
+.deck{max-width:930px;font-size:1.28rem;line-height:1.5;color:#cbd6e5}
+.meta{font:.9rem/1.5 system-ui,sans-serif;color:var(--muted);margin-top:22px}
+main{max-width:980px;margin:auto}
+h2{font-size:2.12rem;line-height:1.14;letter-spacing:-.025em;margin:2.15em 0 .58em}
+h3{font:800 1rem/1.3 system-ui,sans-serif;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-top:1.7em}
+p{margin:1em 0}
+.eq,.callout,.boundary,.negative{margin:26px 0;padding:20px 23px;border-radius:14px;border:1px solid var(--line);background:var(--panel)}
+.callout{border-left:4px solid var(--gold)}
+.boundary{border-left:4px solid var(--green)}
+.negative{border-left:4px solid var(--red)}
+.eq{text-align:center;background:var(--panel2);font-size:1.16rem;overflow:auto}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:28px 0}
+.card{padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.card b{display:block;font:800 1.45rem/1.05 system-ui,sans-serif;margin-bottom:8px}
+.card span{font:.88rem/1.45 system-ui,sans-serif;color:var(--muted)}
+.cluster{margin:20px 0 34px;padding:22px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,#0d1824,#0a141f)}
+.cluster ul{padding-left:1.25em}
+.cluster li{margin:.55em 0}
+.tag{display:inline-block;padding:2px 8px;border:1px solid var(--line);border-radius:999px;font:700 .72rem/1.4 system-ui,sans-serif;white-space:nowrap}
+.proved{color:var(--green)}.open{color:var(--violet)}.neg{color:var(--red)}
+table{width:100%;border-collapse:collapse;margin:26px 0;background:var(--panel);border:1px solid var(--line)}
+th,td{padding:12px 11px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{font:800 .76rem/1.3 system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--cyan);background:#101e2c}
+td{font-size:.94rem}
+.links{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px;font-family:system-ui,sans-serif}
+.links a{border:1px solid var(--line);padding:9px 12px;border-radius:999px;background:var(--panel)}
+footer{max-width:980px;margin:56px auto 0;padding-top:22px;border-top:1px solid var(--line);font:.85rem/1.55 system-ui,sans-serif;color:var(--muted)}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding:18px 14px 60px}table{display:block;overflow:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <div class="brand">ARISTOTLE × EFMW-102</div>
+  <a href="#results">Results</a>
+  <a href="#negative">Negative results</a>
+  <a href="#open">Open obligations</a>
+  <a href="LAWS.md">Law table</a>
+  <a href="ARISTOTLE_SUMMARY.md">Aristotle summary</a>
+  <a href="RequestProject/Main.lean">Lean</a>
+</nav>
+
+<header class="hero">
+  <div class="eyebrow">Lean 4 · theorem extraction · formal claims boundary</div>
+  <h1>What Actually Follows from EFMW-102?</h1>
+  <p class="deck">A machine-checked pass over the 102-equation Monolithic EFMW corpus. The result is not “102 proved laws.” It is a smaller, sharper set of mathematical consequences, structural constraints, negative results, and explicit open theorem programs.</p>
+  <div class="meta">Source corpus: <code>enuminous/Monlithic_EFMW_102_Lean4</code>, commit <code>58f743b</code> · Formal analysis edited by Aristotle (Harmonic)</div>
+</header>
+
+<main>
+<section>
+  <h2>The result in one sentence</h2>
+  <div class="callout"><strong>Aristotle extracted about 40 Lean theorems from the EFMW-102 corpus, all under explicit hypotheses, with no <code>sorry</code> in the five analysis modules; these are mathematical consequences of the encoded equations, not evidence that EFMW is physically correct.</strong></div>
+
+  <div class="grid">
+    <div class="card"><b>102</b><span>source equations in the Monolithic EFMW corpus</span></div>
+    <div class="card"><b>≈40</b><span>machine-checked laws derived in this analysis</span></div>
+    <div class="card"><b>5</b><span>formal result clusters: Golden, Coherence, Dynamics, Metrics, Fields</span></div>
+  </div>
+
+  <p>The distinction matters. Lean can establish that a theorem follows from definitions and assumptions. It cannot establish that the assumptions describe nature. The empirical gate remains outside the proof assistant.</p>
+</section>
+
+<section id="results">
+  <h2>Five clusters of derived laws</h2>
+
+  <div class="cluster">
+    <h3>1 · Golden ratio / Scalar-φ</h3>
+    <ul>
+      <li><span class="tag proved">Proved</span> <strong>φ² = φ + 1</strong> and the Fibonacci power law <strong>φⁿ⁺¹ = Fₙ₊₁φ + Fₙ</strong>.</li>
+      <li><span class="tag proved">Proved</span> Closed forms for <strong>φ²³</strong>, <strong>φ⁴⁶</strong>, and <strong>φ¹³</strong>.</li>
+      <li><span class="tag proved">Proved</span> The φ-tiled operator is a convex weighted combination because <strong>φ⁻¹ + φ⁻² = 1</strong>.</li>
+      <li><span class="tag proved">Proved</span> Scalar-23 scaling is invertible.</li>
+    </ul>
+    <div class="eq">φ²³ = 28657φ + 17711 &nbsp;&nbsp; · &nbsp;&nbsp; φ⁴⁶ = 1836311903φ + 1134903170</div>
+  </div>
+
+  <div class="cluster">
+    <h3>2 · Coherence / Red Queen</h3>
+    <ul>
+      <li><span class="tag proved">Proved</span> The coherence potential is even and has the stated derivative.</li>
+      <li><span class="tag proved">Proved</span> For <strong>a &gt; 0</strong>, equilibria occur at <strong>Φ = 0</strong> or <strong>Φ² = b/a</strong>.</li>
+      <li><span class="tag proved">Proved</span> A Lyapunov law for the coupling-free, noise-free coherence flow: the potential never increases.</li>
+      <li><span class="tag proved">Proved</span> A maximum sustainable disorder-load condition for Red Queen equilibrium.</li>
+    </ul>
+    <div class="eq">βD − γḊ ≤ αK/4</div>
+    <p>This inequality is the exact existence criterion, under the theorem’s hypotheses, for an equilibrium of the analyzed Red Queen form.</p>
+  </div>
+
+  <div class="cluster">
+    <h3>3 · Relaxation, decay, and emergent time</h3>
+    <ul>
+      <li><span class="tag proved">Proved</span> The relaxation equation has the expected unique exponential solution.</li>
+      <li><span class="tag proved">Proved</span> ME-078 is exactly the corresponding relaxation solution for the specified initial/equilibrium data.</li>
+      <li><span class="tag proved">Proved</span> Exponential decay has half-life <strong>τₙ ln 2</strong>.</li>
+      <li><span class="tag proved">Proved</span> If recursive angular rate is positive, accumulated phase is strictly increasing and can serve as a clock variable.</li>
+    </ul>
+  </div>
+
+  <div class="cluster">
+    <h3>4 · Metrics</h3>
+    <ul>
+      <li><span class="tag proved">Proved</span> The coherence score lies in <strong>[0,1]</strong> and equals 1 exactly at equality of the compared states.</li>
+      <li><span class="tag proved">Proved</span> Recursive integrity is bounded above by coherence.</li>
+      <li><span class="tag proved">Proved</span> Kuramoto order parameter bounds.</li>
+      <li><span class="tag proved">Proved</span> Gibbs inequality for KL divergence.</li>
+      <li><span class="tag proved">Proved</span> Phrase entropy bounds, normalized collapse probabilities, existence of a finite Collapse-Ω minimizer, and recursive-risk monotonicity.</li>
+    </ul>
+  </div>
+
+  <div class="cluster">
+    <h3>5 · Fields, PDE structure, and recursion</h3>
+    <ul>
+      <li><span class="tag proved">Proved</span> The covariant scalar operator reduces to the expected Minkowski-space wave operator under the encoded metric conventions.</li>
+      <li><span class="tag proved">Proved</span> ME-005 has effective time coefficient <strong>(1−α²)/c²</strong>.</li>
+      <li><span class="tag proved">Proved</span> ME-007 and ME-008 are componentwise equivalent under their stated encoding.</li>
+      <li><span class="tag proved">Proved</span> Only <strong>α+β</strong> matters in the analyzed S–O pair, and the two equations are mirror images under exchange.</li>
+      <li><span class="tag proved">Proved</span> The Chronologos composition becomes an involution under the stated algebraic hypotheses.</li>
+      <li><span class="tag proved">Proved</span> The encoded accumulation law grows without bound when <strong>ΔE·C &gt; 0</strong>.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="negative">
+  <h2>Negative and constraint results</h2>
+
+  <div class="negative">
+    <strong>Scalar-23 no-go.</strong> Linear Scalar-23 scaling preserves the null state:
+    <div class="eq">S₂₃(0)=0, &nbsp;&nbsp; S₂₃(X)=0 ⇔ X=0.</div>
+    Therefore this scaling alone cannot transform a null state into a nonzero state. Any “rebirth” interpretation requires additional nonlinear or external structure.
+  </div>
+
+  <div class="negative">
+    <strong>ME-005 propagation boundary.</strong> The analyzed field equation reduces to
+    <div class="eq">((1−α²)/c²) φ<sub>tt</sub> − ∇²φ = source.</div>
+    At <strong>α² = 1</strong>, the time-propagation term vanishes and the equation degenerates to a Poisson-type equation. So the encoded expression behaves as a wave equation only on the appropriate side of that parameter boundary.
+  </div>
+
+  <div class="negative">
+    <strong>Bianchi consistency is not automatic.</strong> Because the encoded information tensor contains a Ricci term, conservation/consistency requires an additional differential-geometric obligation. It is not supplied merely by writing the Einstein-like equation.
+  </div>
+</section>
+
+<section id="open">
+  <h2>What remains open</h2>
+
+  <table>
+    <thead><tr><th>Area</th><th>Status</th><th>Missing obligation</th></tr></thead>
+    <tbody>
+      <tr><td>Action principles</td><td><span class="tag open">Open</span></td><td>Formal metric variation / Euler–Lagrange derivation for ME-001, ME-009, ME-013, ME-014.</td></tr>
+      <tr><td>Einstein-like consistency</td><td><span class="tag open">Open</span></td><td>Contracted Bianchi / conservation condition in a differential-geometric setting.</td></tr>
+      <tr><td>Attractors and nonlinear dynamics</td><td><span class="tag open">Open</span></td><td>Existence, uniqueness, Lyapunov exponent and attractor theorems for ME-022–033.</td></tr>
+      <tr><td>PDE well-posedness</td><td><span class="tag open">Open</span></td><td>Well-posedness for the cognitive PDE sector, including ME-036/037.</td></tr>
+      <tr><td>Cosmology</td><td><span class="tag open">Open</span></td><td>A specified metric and full derivation for the rotating Friedmann expression.</td></tr>
+      <tr><td>Relativistic fluid sector</td><td><span class="tag open">Open</span></td><td>Formal treatment of ME-077–081.</td></tr>
+      <tr><td>Empirical claims</td><td><span class="tag open">Empirical</span></td><td>ME-089–102 require experiments or observational data beyond the algebraic bounds proved here.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Why this pass matters</h2>
+  <p>The value of the Aristotle pass is not that every EFMW equation survived unchanged. The value is that the corpus became more sharply partitioned:</p>
+  <div class="boundary">
+    <strong>Machine-checked:</strong> algebraic identities, bounded metrics, relaxation laws, selected Lyapunov and equilibrium statements, parameter degeneracies, invertibility, and several structural implications.<br><br>
+    <strong>Not machine-checked as physics:</strong> action-to-field derivations, conservation closure, nonlinear existence theory, PDE well-posedness, cosmological modeling, relativistic fluid modeling, and empirical validity.
+  </div>
+  <p>That boundary is a feature, not a weakness. Formalization tells us exactly where proof ends and scientific validation must begin.</p>
+
+  <div class="links">
+    <a href="LAWS.md">Full theorem table</a>
+    <a href="ARISTOTLE_SUMMARY.md">Aristotle summary</a>
+    <a href="RequestProject/Golden.lean">Golden.lean</a>
+    <a href="RequestProject/Coherence.lean">Coherence.lean</a>
+    <a href="RequestProject/Dynamics.lean">Dynamics.lean</a>
+    <a href="RequestProject/Metrics.lean">Metrics.lean</a>
+    <a href="RequestProject/Fields.lean">Fields.lean</a>
+    <a href="https://github.com/enuminous/Aristotle-102-Monolithic-Lean">Repository</a>
+  </div>
+</section>
+</main>
+
+<footer>
+Formal-analysis site for <strong>Aristotle-102-Monolithic-Lean</strong>. Theorems establish consequences of the encoded equations under their stated assumptions. They do not establish the empirical truth of EFMW. Aristotle (Harmonic) is credited in the repository as the formal-analysis editor.
+</footer>
+</div>
+</body>
+</html>
